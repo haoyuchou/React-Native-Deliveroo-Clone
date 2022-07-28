@@ -6,21 +6,34 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { XIcon } from "react-native-heroicons/solid";
 import { useNavigation } from "@react-navigation/native";
 import * as Progress from "react-native-progress";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
+//import MapViewDirections from 'react-native-maps-directions';
 
 export default function DeliveryScreen() {
   const selectedResturant = useSelector((state) => state.resturant.resturant);
   const navigation = useNavigation();
-  console.log("Selected Restuarant latitude: ", selectedResturant.lat);
-  console.log("Selected Restuarant longitude: ", selectedResturant.long);
+  // the starting point: selectedResturant.lat, selectedResturant.long
+
+  //console.log("Selected Restuarant latitude: ", selectedResturant.lat);
+  //console.log("Selected Restuarant longitude: ", selectedResturant.long);
 
   const { width, height } = Dimensions.get("window");
-  
+
+  const [coordinates] = useState([
+    {
+      latitude: Number(selectedResturant.lat),
+      longitude: Number(selectedResturant.long),
+    },
+    {
+      latitude: 25.0412256,
+      longitude: 121.5411727,
+    },
+  ]);
 
   console.log("Width, Height: ", width, height);
   // Width, Height: 411.42857142857144 683.4285714285714
@@ -39,8 +52,8 @@ export default function DeliveryScreen() {
 
           <Text className="text-white font-light text-lg">Order Help</Text>
         </View>
-         
-         {/* flowting card */}
+
+        {/* flowting card */}
         <View className="bg-white rounded-lg p-5 shadow-md z-50 mx-4 my-6">
           <View className="flex-row justify-between">
             <View>
@@ -73,15 +86,31 @@ export default function DeliveryScreen() {
         className="flex-grow z-0 -mt-10"
         mapType="mutedStandard"
       >
-        <Marker 
-            coordinate={{
-                latitude: Number(selectedResturant.lat),
-                longitude: Number(selectedResturant.long)
-            }}
-            title={selectedResturant.title}
-            description={selectedResturant.short_description}
-            identifier="origin"
-            pinColor="#00CCBB"
+        <Marker
+          coordinate={{
+            latitude: Number(selectedResturant.lat),
+            longitude: Number(selectedResturant.long),
+          }}
+          title={selectedResturant.title}
+          description={selectedResturant.short_description}
+          identifier="origin"
+          pinColor="#00CCBB"
+        />
+        <Marker
+          coordinate={{
+            latitude: coordinates[1].latitude,
+            longitude: coordinates[1].longitude,
+          }}
+          title={selectedResturant.title}
+          description={selectedResturant.short_description}
+          identifier="origin"
+          pinColor="#00CCBB"
+        />
+        <Polyline
+          coordinates={coordinates}
+          strokeColor="#00CCBB" // fallback for when `strokeColors` is not supported by the map-provider
+          strokeColors={['#00CCBB']}
+          strokeWidth={6}
         />
       </MapView>
     </View>
